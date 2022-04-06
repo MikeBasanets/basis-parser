@@ -1,11 +1,9 @@
 package parser
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -17,7 +15,20 @@ const (
 	PageUrlAtCategoryPage ClothingParameter = iota
 	ImageUrl
 	Price
+	Description
+	Brand
 	Color
+	FitTypeShirts
+	FitTypePants
+	Composition
+	Pattern
+	Season
+	LegOpeningCm 
+	SleeveLengthCm
+	LengthCm
+	CollarOrCutout
+	InsulationComposition
+	HoodType
 )
 
 type ClothingType int
@@ -36,13 +47,26 @@ func initRegexp() map[ClothingParameter]*regexp.Regexp {
 	result[ImageUrl], _ = regexp.Compile(`property="og:image" content="([^"]*)"`)
 	result[Price], _ = regexp.Compile(`"price_amount":([^,]*),`)
 	result[Color], _ = regexp.Compile(`"color_family":"([\p{L}]+)"`)
+	result[FitTypeShirts], _ = regexp.Compile(`"type_of_knitwear","text":"([^"]*)"`)
+	result[FitTypePants], _ = regexp.Compile(`"type_of_knitwear","text":"([^"]*)"`)
+	result[Description], _ = regexp.Compile(`data-name="([^"]*)"`)
+	result[Brand], _ = regexp.Compile(`data-brand="([^"]*)"`)
+	result[Season], _ = regexp.Compile(`"season_wear","text":"([^"]*)"`)
+	result[Pattern], _ = regexp.Compile(`"print","text":"([^"]*)"`)
+	result[Composition], _ = regexp.Compile(`"material_filling","text":"([^"]*)"`)
+	result[InsulationComposition], _ = regexp.Compile(`"material_filler","text":"([^"]*)"`)
+	result[HoodType], _ = regexp.Compile(`"hood_features","text":"([^"]*)"`)
+	result[LegOpeningCm], _ = regexp.Compile(`"bottom_width","text":"([^"]*)"`)
+	result[SleeveLengthCm], _ = regexp.Compile(`"sleeve_length","text":"([^"]*)"`)
+	result[SleeveLengthCm], _ = regexp.Compile(`"sleeve_length","text":"([^"]*)"`)
+	result[LengthCm], _ = regexp.Compile(`"length","text":"([^"]*)"`)
 	return result
 }
 
-func saveAsJson(data ClothingItem, path string) {
+/*func saveAsJson(data ClothingItem, path string) {
 	file, _ := json.MarshalIndent(data, "", " ")
 	_ = ioutil.WriteFile(path, file, 0644)
-}
+}*/
 
 func extractCategoryLinks(categoryUrl string) []string {
 	links := map[string]struct{}{}

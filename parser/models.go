@@ -1,10 +1,5 @@
 package parser
 
-type QuizData struct {
-	Purpose      string `json:"purpose"`
-	BirthdayYear int    `json:"birthdayYear"`
-}
-
 type Wardrobe struct {
 	Pants     []Pants     `json:"pants"`
 	Shirts    []Shirt     `json:"shirts"`
@@ -12,22 +7,35 @@ type Wardrobe struct {
 }
 
 type ClothingItem struct {
-	ID       int64  `json:"-"`
-	PageUrl  string `json:"page"`
-	ImageUrl string `json:"image"`
-	Color    string `json:"-"`
-	Price    string `json:"-"`
+	ID          int64
+	PageUrl     string
+	ImageUrl    string
+	Color       string
+	Pattern     string
+	Description string
+	Brand       string
+	Price       string
+	Season      string
+	Subcategory string
 }
 
 type Outerwear struct {
 	ClothingItem
-	Warmth int32 `json:"-"`
+	HoodType              string
+	LengthCm              int
+	SleeveLengthCm        int
+	InsulationComposition string
 }
 
 type Pants struct {
 	ClothingItem
+	FitType string
 }
 
 type Shirt struct {
 	ClothingItem
+	FitType        string
+	LengthCm       int
+	SleeveLengthCm int
+	CollarOrCutout string
 }
