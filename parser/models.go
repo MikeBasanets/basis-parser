@@ -1,11 +1,5 @@
 package parser
 
-type Wardrobe struct {
-	Pants     []Pants     `json:"pants"`
-	Shirts    []Shirt     `json:"shirts"`
-	Outerwear []Outerwear `json:"outerwear"`
-}
-
 type ClothingItem struct {
 	ID          int64
 	PageUrl     string
@@ -29,7 +23,8 @@ type Outerwear struct {
 
 type Pants struct {
 	ClothingItem
-	FitType string
+	FitType      string
+	LegOpeningCm int
 }
 
 type Shirt struct {

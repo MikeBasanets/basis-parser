@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -23,7 +24,7 @@ const (
 	Composition
 	Pattern
 	Season
-	LegOpeningCm 
+	LegOpeningCm
 	SleeveLengthCm
 	LengthCm
 	CollarOrCutout
@@ -63,10 +64,6 @@ func initRegexp() map[ClothingParameter]*regexp.Regexp {
 	return result
 }
 
-/*func saveAsJson(data ClothingItem, path string) {
-	file, _ := json.MarshalIndent(data, "", " ")
-	_ = ioutil.WriteFile(path, file, 0644)
-}*/
 
 func extractCategoryLinks(categoryUrl string) []string {
 	links := map[string]struct{}{}
@@ -112,8 +109,8 @@ func loadPageText(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	log.Printf("Loaded with response: %s at: %s\n", response.Status, url)
 	if response.StatusCode != 200 {
-		fmt.Println(response.Status)
 	}
 	defer response.Body.Close()
 	b, _ := io.ReadAll(response.Body)
