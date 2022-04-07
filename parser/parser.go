@@ -114,7 +114,11 @@ func extractCommonParameters(pageText string) (ClothingItem, error) {
 	if err != nil {
 		return ClothingItem{}, err
 	}
-	result.Price, err = extractParameter(pageText, Price)
+	priceStr, err := extractParameter(pageText, Price)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.Price, err = strconv.Atoi(priceStr)
 	if err != nil {
 		return ClothingItem{}, err
 	}

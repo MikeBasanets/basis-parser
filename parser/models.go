@@ -8,7 +8,7 @@ type ClothingItem struct {
 	Pattern     string
 	Description string
 	Brand       string
-	Price       string
+	Price       int
 	Season      string
 	Subcategory string `json:"subcategory"`
 }
