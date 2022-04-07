@@ -2,6 +2,7 @@ package main
 
 import (
 	"basis-parser/parser"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +12,24 @@ import (
 func main() {
 	start := time.Now()
 	setUpLogging()
-	parser.ParseCategory("https://www.lamoda.by/c/517/clothes-muzhskie-bryuki/", parser.PantsType)
+	configStr, err := os.ReadFile("config.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var config parser.ParsingConfig
+	err = json.Unmarshal([]byte(configStr), &config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for i := range config.OuterwearConfig {
+		parser.ParseOuterwearSubcategory(config.OuterwearConfig[i].SubcategoryUrl, config.OuterwearConfig[i].DefaultParams)
+	}
+	for i := range config.ShirtsConfig {
+		parser.ParseShirtSubcategory(config.ShirtsConfig[i].SubcategoryUrl, config.ShirtsConfig[i].DefaultParams)
+	}
+	for i := range config.PantsConfig {
+		parser.ParsePantsSubcategory(config.PantsConfig[i].SubcategoryUrl, config.PantsConfig[i].DefaultParams)
+	}
 	duration := time.Since(start)
 	fmt.Println(duration.Seconds(), " Seconds")
 }

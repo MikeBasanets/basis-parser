@@ -1,0 +1,40 @@
+{
+    "pantsConfig": [
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/517/clothes-muzhskie-bryuki/",
+            "defaultParams": {
+                "subcategory": "chinos"
+            }
+        },
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/513/clothes-muzhskie-d-insy/",
+            "defaultParams": {
+                "subcategory": "jeans"
+            }
+        }
+    ],
+    "shirtsConfig": [
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/515/clothes-muzhskie-rubashki-i-sorochki/?property_neckline_men=33822",
+            "defaultParams": {
+                "subcategory": "collared",
+                "collarOrCutout": "buttonUp"
+            }
+        },
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/2512/clothes-muzhskie-futbolki/?property_neckline_men=33821",
+            "defaultParams": {
+                "subcategory": "tee",
+                "collarOrCutout": "crew"
+            }
+        }
+    ],
+    "outerwearConfig": [
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/479/clothes-muzhskaya-verkhnyaya-odezhda/",
+            "defaultParams": {
+                "subcategory": "all"
+            }
+        }
+    ]
+}

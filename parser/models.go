@@ -10,7 +10,7 @@ type ClothingItem struct {
 	Brand       string
 	Price       string
 	Season      string
-	Subcategory string
+	Subcategory string `json:"subcategory"`
 }
 
 type Outerwear struct {
@@ -32,5 +32,5 @@ type Shirt struct {
 	FitType        string
 	LengthCm       int
 	SleeveLengthCm int
-	CollarOrCutout string
+	CollarOrCutout string `json:"collarOrCutout"`
 }

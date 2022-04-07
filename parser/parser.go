@@ -32,14 +32,6 @@ const (
 	HoodType
 )
 
-type ClothingType int
-
-const (
-	OuterwearType ClothingType = iota
-	ShirtType
-	PantsType
-)
-
 var regexpByParameter = initRegexp()
 
 func initRegexp() map[ClothingParameter]*regexp.Regexp {
@@ -59,40 +51,164 @@ func initRegexp() map[ClothingParameter]*regexp.Regexp {
 	result[HoodType], _ = regexp.Compile(`"hood_features","text":"([^"]*)"`)
 	result[LegOpeningCm], _ = regexp.Compile(`"bottom_width","text":"([^"]*)"`)
 	result[SleeveLengthCm], _ = regexp.Compile(`"sleeve_length","text":"([^"]*)"`)
-	result[SleeveLengthCm], _ = regexp.Compile(`"sleeve_length","text":"([^"]*)"`)
 	result[LengthCm], _ = regexp.Compile(`"length","text":"([^"]*)"`)
 	return result
 }
 
-
-func extractCategoryLinks(categoryUrl string) []string {
-	links := map[string]struct{}{}
-	for i := 1; i <= 2; i++ {
-		currentPageLinks := extractCategoryPageLinks(categoryUrl + "?&page=" + strconv.Itoa(i))
-		linksQtyBefore := len(links)
-		for j := range currentPageLinks {
-			links[currentPageLinks[j]] = struct{}{}
+func ParseOuterwearSubcategory(url string, baselineItem Outerwear) {
+	urls := extractSubcategoryUrls(url)
+	for i := range urls {
+		pageText, err := loadPageText(urls[i])
+		if err != nil {
+			continue
 		}
-		if len(links) == linksQtyBefore {
-			break
+		item, err := extractOuterwear(pageText)
+		if err != nil {
+			continue
 		}
-		fmt.Printf("page: %d\t\t links: %d\n", i, len(links)-linksQtyBefore)
+		item.PageUrl = urls[i]
+		item.Subcategory = baselineItem.Subcategory
+		fmt.Println(item)
 	}
-	var linksList []string
-	for i := range links {
-		linksList = append(linksList, i)
-	}
-	return linksList
 }
 
-func extractCategoryPageLinks(url string) []string {
-	var links []string
-	pageText, _ := loadPageText(url)
-	l := regexpByParameter[PageUrlAtCategoryPage].FindAllStringSubmatch(pageText, 4)
-	for i := range l {
-		links = append(links, "https://www.lamoda.by"+l[i][1])
+func ParseShirtSubcategory(url string, baselineItem Shirt) {
+	urls := extractSubcategoryUrls(url)
+	for i := range urls {
+		pageText, err := loadPageText(urls[i])
+		if err != nil {
+			continue
+		}
+		item, err := extractShirt(pageText)
+		if err != nil {
+			continue
+		}
+		item.PageUrl = urls[i]
+		item.Subcategory = baselineItem.Subcategory
+		item.CollarOrCutout = baselineItem.CollarOrCutout
+		fmt.Println(item)
 	}
-	return links
+}
+
+func ParsePantsSubcategory(url string, baselineItem Pants) {
+	urls := extractSubcategoryUrls(url)
+	for i := range urls {
+		pageText, err := loadPageText(urls[i])
+		if err != nil {
+			continue
+		}
+		item, err := extractPants(pageText)
+		if err != nil {
+			continue
+		}
+		item.PageUrl = urls[i]
+		item.Subcategory = baselineItem.Subcategory
+		fmt.Println(item)
+	}
+}
+
+func extractCommonParameters(pageText string) (ClothingItem, error) {
+	result := ClothingItem{}
+	var err error
+	result.Color, err = extractParameter(pageText, Color)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.Price, err = extractParameter(pageText, Price)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.ImageUrl, err = extractParameter(pageText, ImageUrl)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.Brand, err = extractParameter(pageText, Brand)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.Description, err = extractParameter(pageText, Description)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.Pattern, err = extractParameter(pageText, Pattern)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	result.Season, err = extractParameter(pageText, Season)
+	if err != nil {
+		return ClothingItem{}, err
+	}
+	return result, nil
+}
+
+func extractOuterwear(pageText string) (Outerwear, error) {
+	commonParams, err := extractCommonParameters(pageText)
+	if err != nil {
+		return Outerwear{}, err
+	}
+	result := Outerwear{ClothingItem: commonParams}
+	result.HoodType, err = extractParameter(pageText, HoodType)
+	length, _ := extractParameter(pageText, LengthCm)
+	result.LengthCm, _ = strconv.Atoi(length)
+	sleeveLength, _ := extractParameter(pageText, SleeveLengthCm)
+	result.SleeveLengthCm, _ = strconv.Atoi(sleeveLength)
+	result.InsulationComposition, _ = extractParameter(pageText, InsulationComposition)
+	return result, nil
+}
+
+func extractShirt(pageText string) (Shirt, error) {
+	commonParams, err := extractCommonParameters(pageText)
+	if err != nil {
+		return Shirt{}, err
+	}
+	result := Shirt{ClothingItem: commonParams}
+	result.FitType, _ = extractParameter(pageText, FitTypeShirts)
+	length, _ := extractParameter(pageText, LengthCm)
+	result.LengthCm, _ = strconv.Atoi(length)
+	sleeveLength, _ := extractParameter(pageText, SleeveLengthCm)
+	result.SleeveLengthCm, _ = strconv.Atoi(sleeveLength)
+	return result, nil
+}
+
+func extractPants(pageText string) (Pants, error) {
+	commonParams, err := extractCommonParameters(pageText)
+	if err != nil {
+		return Pants{}, err
+	}
+	result := Pants{ClothingItem: commonParams}
+	result.FitType, _ = extractParameter(pageText, FitTypePants)
+	legOpening, _ := extractParameter(pageText, LegOpeningCm)
+	result.LegOpeningCm, _ = strconv.Atoi(legOpening)
+	return result, nil
+}
+
+func extractSubcategoryUrls(categoryUrl string) []string {
+	urls := map[string]struct{}{}
+	for i := 1; i <= 2; i++ {
+		currentPageUrls := extractCategoryPageUrls(categoryUrl + "?&page=" + strconv.Itoa(i))
+		urlQtyBefore := len(urls)
+		for j := range currentPageUrls {
+			urls[currentPageUrls[j]] = struct{}{}
+		}
+		if len(urls) == urlQtyBefore {
+			break
+		}
+	}
+	var urlList []string
+	for i := range urls {
+		urlList = append(urlList, i)
+	}
+	return urlList
+}
+
+func extractCategoryPageUrls(url string) []string {
+	var urls []string
+	pageText, _ := loadPageText(url)
+	matches := regexpByParameter[PageUrlAtCategoryPage].FindAllStringSubmatch(pageText, 4)
+	for i := range matches {
+		urls = append(urls, "https://www.lamoda.by"+matches[i][1])
+	}
+	return urls
 }
 
 func extractParameter(pageText string, param ClothingParameter) (string, error) {
@@ -100,7 +216,7 @@ func extractParameter(pageText string, param ClothingParameter) (string, error) 
 	if len(result) == 2 {
 		return result[1], nil
 	}
-	return "", errors.New("color not found")
+	return "", errors.New("parameter not found")
 }
 
 func loadPageText(url string) (string, error) {
@@ -111,33 +227,9 @@ func loadPageText(url string) (string, error) {
 	}
 	log.Printf("Loaded with response: %s at: %s\n", response.Status, url)
 	if response.StatusCode != 200 {
+		return "", err
 	}
-	defer response.Body.Close()
 	b, _ := io.ReadAll(response.Body)
+	response.Body.Close()
 	return string(b), nil
-}
-
-func ParseCategory(url string, categoryType ClothingType) {
-	links := extractCategoryLinks(url)
-	for i := range links {
-		pageText, err := loadPageText(links[i])
-		if err != nil {
-			continue
-		}
-		item := ClothingItem{}
-		item.Color, _ = extractParameter(pageText, Color)
-		if err != nil {
-			continue
-		}
-		item.Price, err = extractParameter(pageText, Price)
-		if err != nil {
-			continue
-		}
-		item.ImageUrl, err = extractParameter(pageText, ImageUrl)
-		if err != nil {
-			continue
-		}
-		item.PageUrl = links[i]
-		fmt.Println(item)
-	}
 }
