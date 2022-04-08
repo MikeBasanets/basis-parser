@@ -1,8 +1,8 @@
 package parser
 
 import (
+	"basis-parser/db"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -55,7 +55,7 @@ func initRegexp() map[ClothingParameter]*regexp.Regexp {
 	return result
 }
 
-func ParseOuterwearSubcategory(url string, baselineItem Outerwear) {
+func ParseOuterwearSubcategory(url string, baselineItem db.Outerwear, output func(db.Outerwear)) {
 	urls := extractSubcategoryUrls(url)
 	for i := range urls {
 		pageText, err := loadPageText(urls[i])
@@ -68,11 +68,11 @@ func ParseOuterwearSubcategory(url string, baselineItem Outerwear) {
 		}
 		item.PageUrl = urls[i]
 		item.Subcategory = baselineItem.Subcategory
-		fmt.Println(item)
+		output(item)
 	}
 }
 
-func ParseShirtSubcategory(url string, baselineItem Shirt) {
+func ParseShirtSubcategory(url string, baselineItem db.Shirt, output func(db.Shirt)) {
 	urls := extractSubcategoryUrls(url)
 	for i := range urls {
 		pageText, err := loadPageText(urls[i])
@@ -86,11 +86,11 @@ func ParseShirtSubcategory(url string, baselineItem Shirt) {
 		item.PageUrl = urls[i]
 		item.Subcategory = baselineItem.Subcategory
 		item.CollarOrCutout = baselineItem.CollarOrCutout
-		fmt.Println(item)
+		output(item)
 	}
 }
 
-func ParsePantsSubcategory(url string, baselineItem Pants) {
+func ParsePantsSubcategory(url string, baselineItem db.Pants, output func(db.Pants)) {
 	urls := extractSubcategoryUrls(url)
 	for i := range urls {
 		pageText, err := loadPageText(urls[i])
@@ -103,54 +103,54 @@ func ParsePantsSubcategory(url string, baselineItem Pants) {
 		}
 		item.PageUrl = urls[i]
 		item.Subcategory = baselineItem.Subcategory
-		fmt.Println(item)
+		output(item)
 	}
 }
 
-func extractCommonParameters(pageText string) (ClothingItem, error) {
-	result := ClothingItem{}
+func extractCommonParameters(pageText string) (db.ClothingItem, error) {
+	result := db.ClothingItem{}
 	var err error
 	result.Color, err = extractParameter(pageText, Color)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	priceStr, err := extractParameter(pageText, Price)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	result.Price, err = strconv.Atoi(priceStr)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	result.ImageUrl, err = extractParameter(pageText, ImageUrl)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	result.Brand, err = extractParameter(pageText, Brand)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	result.Description, err = extractParameter(pageText, Description)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	result.Pattern, err = extractParameter(pageText, Pattern)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	result.Season, err = extractParameter(pageText, Season)
 	if err != nil {
-		return ClothingItem{}, err
+		return db.ClothingItem{}, err
 	}
 	return result, nil
 }
 
-func extractOuterwear(pageText string) (Outerwear, error) {
+func extractOuterwear(pageText string) (db.Outerwear, error) {
 	commonParams, err := extractCommonParameters(pageText)
 	if err != nil {
-		return Outerwear{}, err
+		return db.Outerwear{}, err
 	}
-	result := Outerwear{ClothingItem: commonParams}
+	result := db.Outerwear{ClothingItem: commonParams}
 	result.HoodType, err = extractParameter(pageText, HoodType)
 	length, _ := extractParameter(pageText, LengthCm)
 	result.LengthCm, _ = strconv.Atoi(length)
@@ -160,12 +160,12 @@ func extractOuterwear(pageText string) (Outerwear, error) {
 	return result, nil
 }
 
-func extractShirt(pageText string) (Shirt, error) {
+func extractShirt(pageText string) (db.Shirt, error) {
 	commonParams, err := extractCommonParameters(pageText)
 	if err != nil {
-		return Shirt{}, err
+		return db.Shirt{}, err
 	}
-	result := Shirt{ClothingItem: commonParams}
+	result := db.Shirt{ClothingItem: commonParams}
 	result.FitType, _ = extractParameter(pageText, FitTypeShirts)
 	length, _ := extractParameter(pageText, LengthCm)
 	result.LengthCm, _ = strconv.Atoi(length)
@@ -174,12 +174,12 @@ func extractShirt(pageText string) (Shirt, error) {
 	return result, nil
 }
 
-func extractPants(pageText string) (Pants, error) {
+func extractPants(pageText string) (db.Pants, error) {
 	commonParams, err := extractCommonParameters(pageText)
 	if err != nil {
-		return Pants{}, err
+		return db.Pants{}, err
 	}
-	result := Pants{ClothingItem: commonParams}
+	result := db.Pants{ClothingItem: commonParams}
 	result.FitType, _ = extractParameter(pageText, FitTypePants)
 	legOpening, _ := extractParameter(pageText, LegOpeningCm)
 	result.LegOpeningCm, _ = strconv.Atoi(legOpening)

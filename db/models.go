@@ -1,7 +1,6 @@
-package parser
+package db
 
 type ClothingItem struct {
-	ID          int64
 	PageUrl     string
 	ImageUrl    string
 	Color       string
