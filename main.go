@@ -15,7 +15,12 @@ func main() {
 	setUpLogging()
 	godotenv.Load(".env")
 	db.Connect()
+	startOfParsing := time.Now()
 	parseAndSaveToDb()
+	err := db.RemoveClothingUpdatedBefore(startOfParsing)
+	if err != nil {
+		log.Println(err)
+	}
 	db.Disconnect()
 }
 

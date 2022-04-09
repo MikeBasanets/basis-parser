@@ -8,7 +8,10 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"time"
 )
+
+const MAX_PAGES_IN_SUBCATEGORY = 167
 
 type ClothingParameter int
 
@@ -68,6 +71,7 @@ func ParseOuterwearSubcategory(url string, baselineItem db.Outerwear, output fun
 		}
 		item.PageUrl = urls[i]
 		item.Subcategory = baselineItem.Subcategory
+		item.LastUpdated = time.Now()
 		output(item)
 	}
 }
@@ -86,6 +90,7 @@ func ParseShirtSubcategory(url string, baselineItem db.Shirt, output func(db.Shi
 		item.PageUrl = urls[i]
 		item.Subcategory = baselineItem.Subcategory
 		item.CollarOrCutout = baselineItem.CollarOrCutout
+		item.LastUpdated = time.Now()
 		output(item)
 	}
 }
@@ -103,6 +108,7 @@ func ParsePantsSubcategory(url string, baselineItem db.Pants, output func(db.Pan
 		}
 		item.PageUrl = urls[i]
 		item.Subcategory = baselineItem.Subcategory
+		item.LastUpdated = time.Now()
 		output(item)
 	}
 }
@@ -188,7 +194,7 @@ func extractPants(pageText string) (db.Pants, error) {
 
 func extractSubcategoryUrls(categoryUrl string) []string {
 	urls := map[string]struct{}{}
-	for i := 1; i <= 2; i++ {
+	for i := 1; i <= MAX_PAGES_IN_SUBCATEGORY; i++ {
 		currentPageUrls := extractCategoryPageUrls(categoryUrl + "?&page=" + strconv.Itoa(i))
 		urlQtyBefore := len(urls)
 		for j := range currentPageUrls {
@@ -208,7 +214,7 @@ func extractSubcategoryUrls(categoryUrl string) []string {
 func extractCategoryPageUrls(url string) []string {
 	var urls []string
 	pageText, _ := loadPageText(url)
-	matches := regexpByParameter[PageUrlAtCategoryPage].FindAllStringSubmatch(pageText, 4)
+	matches := regexpByParameter[PageUrlAtCategoryPage].FindAllStringSubmatch(pageText, -1)
 	for i := range matches {
 		urls = append(urls, "https://www.lamoda.by"+matches[i][1])
 	}

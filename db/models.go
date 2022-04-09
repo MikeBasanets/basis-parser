@@ -1,5 +1,7 @@
 package db
 
+import "time"
+
 type ClothingItem struct {
 	PageUrl     string
 	ImageUrl    string
@@ -10,6 +12,7 @@ type ClothingItem struct {
 	Price       int
 	Season      string
 	Subcategory string `json:"subcategory"`
+	LastUpdated time.Time
 }
 
 type Outerwear struct {
