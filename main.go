@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -34,6 +35,15 @@ func setUpLogging() {
 
 func parseAndSaveToDb() {
 	config := loadConfig()
+	wg := &sync.WaitGroup{}
+	wg.Add(3)
+	go parseOuterwearSubcategories(config, wg)
+	go parseShirtSubcategories(config, wg)
+	go parsePantsSubcategories(config, wg)
+	wg.Wait()
+}
+
+func parseOuterwearSubcategories(config parser.ParsingConfig, wg *sync.WaitGroup) {
 	for i := range config.OuterwearConfig {
 		parser.ParseOuterwearSubcategory(config.OuterwearConfig[i].SubcategoryUrl, config.OuterwearConfig[i].DefaultParams, func(result db.Outerwear) {
 			err := db.UpsertOuterwear(result)
@@ -42,6 +52,10 @@ func parseAndSaveToDb() {
 			}
 		})
 	}
+	wg.Done()
+}
+
+func parseShirtSubcategories(config parser.ParsingConfig, wg *sync.WaitGroup) {
 	for i := range config.ShirtsConfig {
 		parser.ParseShirtSubcategory(config.ShirtsConfig[i].SubcategoryUrl, config.ShirtsConfig[i].DefaultParams, func(result db.Shirt) {
 			err := db.UpsertShirt(result)
@@ -50,6 +64,10 @@ func parseAndSaveToDb() {
 			}
 		})
 	}
+	wg.Done()
+}
+
+func parsePantsSubcategories(config parser.ParsingConfig, wg *sync.WaitGroup) {
 	for i := range config.PantsConfig {
 		parser.ParsePantsSubcategory(config.PantsConfig[i].SubcategoryUrl, config.PantsConfig[i].DefaultParams, func(result db.Pants) {
 			err := db.UpsertPants(result)
@@ -58,6 +76,7 @@ func parseAndSaveToDb() {
 			}
 		})
 	}
+	wg.Done()
 }
 
 func loadConfig() parser.ParsingConfig {

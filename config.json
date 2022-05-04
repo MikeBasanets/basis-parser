@@ -1,9 +1,15 @@
 {
     "pantsConfig": [
         {
-            "subcategoryUrl": "https://www.lamoda.by/c/517/clothes-muzhskie-bryuki/",
+            "subcategoryUrl": "https://www.lamoda.by/c/7600/clothes-men-chinos/",
             "defaultParams": {
                 "subcategory": "chinos"
+            }
+        },
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/2638/clothes-brukim/",
+            "defaultParams": {
+                "subcategory": "casual_trousers"
             }
         },
         {
@@ -15,17 +21,38 @@
     ],
     "shirtsConfig": [
         {
-            "subcategoryUrl": "https://www.lamoda.by/c/515/clothes-muzhskie-rubashki-i-sorochki/?property_neckline_men=33822",
+            "subcategoryUrl": "https://www.lamoda.by/c/2517/clothes-muzhskie-rubashki-s-korotkim/?print=6187&property_neckline_men=33822",
             "defaultParams": {
-                "subcategory": "collared",
-                "collarOrCutout": "buttonUp"
+                "subcategory": "hawaiian",
+                "collarOrCutout": "button_up"
             }
         },
         {
-            "subcategoryUrl": "https://www.lamoda.by/c/2512/clothes-muzhskie-futbolki/?property_neckline_men=33821",
+            "subcategoryUrl": "https://www.lamoda.by/c/2518/clothes-muzhskie-rubashki-s-dlinnym/?print=18579,6192&property_neckline_men=33827&base_materials=19",
+            "defaultParams": {
+                "subcategory": "ocbd",
+                "collarOrCutout": "button_down"
+            }
+        },
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/2518/clothes-muzhskie-rubashki-s-dlinnym/?print=18579,6192&property_neckline_men=33822&base_materials=19,8",
+            "defaultParams": {
+                "subcategory": "dress",
+                "collarOrCutout": "button_up"
+            }
+        },
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/2512/clothes-muzhskie-futbolki/?property_neckline_men=33821&print=18579,6192",
             "defaultParams": {
                 "subcategory": "tee",
                 "collarOrCutout": "crew"
+            }
+        },
+        {
+            "subcategoryUrl": "https://www.lamoda.by/c/2512/clothes-muzhskie-futbolki/?print=18579,6192&property_neckline_men=33826",
+            "defaultParams": {
+                "subcategory": "polo",
+                "collarOrCutout": "polo"
             }
         }
     ],
